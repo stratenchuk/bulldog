@@ -1,0 +1,120 @@
+class TreeNode {
+    value: number; // Предполагаем, что значение узла - это число
+    left: TreeNode | null; // Левый потомок может быть TreeNode или null
+    right: TreeNode | null; // Правый потомок может быть TreeNode или null
+
+    constructor(value: number) {
+        this.value = value;
+        this.left = null;
+        this.right = null;
+    }
+}
+
+class BinaryTree {
+    root: TreeNode | null; // Корень дерева может быть TreeNode или null
+
+    constructor() {
+        this.root = null;
+    }
+
+    // Вставка элемента
+    insert(value: number): void {
+        const newNode = new TreeNode(value);
+        if (!this.root) {
+            this.root = newNode;
+            return;
+        }
+
+        this.insertNode(this.root, newNode);
+    }
+
+    insertNode(node: TreeNode, newNode: TreeNode): void {
+        if (newNode.value < node.value) {
+            if (!node.left) {
+                node.left = newNode;
+            } else {
+                this.insertNode(node.left, newNode);
+            }
+        } else {
+            if (!node.right) {
+                node.right = newNode;
+            } else {
+                this.insertNode(node.right, newNode);
+            }
+        }
+    }
+
+    // Поиск элемента
+    search(value: number): boolean {
+        return this.searchNode(this.root, value);
+    }
+
+    searchNode(node: TreeNode | null, value: number): boolean {
+        if (!node) {
+            return false;
+        }
+        if (value === node.value) {
+            return true;
+        }
+        return value < node.value ? this.searchNode(node.left, value) : this.searchNode(node.right, value);
+    }
+
+    // Удаление элемента
+    delete(value: number): void {
+        this.root = this.deleteNode(this.root, value);
+    }
+
+    deleteNode(node: TreeNode | null, value: number): TreeNode | null {
+        if (!node) {
+            return null;
+        }
+
+        if (value < node.value) {
+            node.left = this.deleteNode(node.left, value);
+        } else if (value > node.value) {
+            node.right = this.deleteNode(node.right, value);
+        } else {
+            // Узел с одним или нулевым потомком
+            if (!node.left) {
+                return node.right;
+            } else if (!node.right) {
+                return node.left;
+            }
+
+            // Узел с двумя потомками
+            const minRightNode = this.findMinNode(node.right);
+            if (minRightNode) {
+                node.value = minRightNode.value;
+                node.right = this.deleteNode(node.right, minRightNode.value);
+            }
+        }
+        return node;
+    }
+
+    findMinNode(node: TreeNode | null): TreeNode | null {
+        while (node && node.left) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    // Изменение элемента
+    update(oldValue: number, newValue: number): void {
+        this.delete(oldValue);
+        this.insert(newValue);
+    }
+
+    // Определение высоты дерева
+    height(): number {
+        return this.calculateHeight(this.root);
+    }
+
+    calculateHeight(node: TreeNode | null): number {
+        if (!node) {
+            return -1; // Возвращаем -1 для учета высоты узлов
+        }
+        const leftHeight = this.calculateHeight(node.left);
+        const rightHeight = this.calculateHeight(node.right);
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+}

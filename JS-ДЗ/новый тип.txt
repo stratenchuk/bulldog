@@ -1,0 +1,20 @@
+type Bulldog<T> = {
+    [K in keyof T]-?: T[K]; // Убираем все необязательные свойства
+};
+
+// Пример использования
+interface User {
+    id: number;
+    name: string;
+    email?: string; // Необязательное свойство
+    age?: number;   // Необязательное свойство
+}
+
+// Используем Bulldog, чтобы получить только обязательные свойства
+type UserBulldog = Bulldog<User>;
+
+// Результат: 
+// type UserBulldog = {
+//     id: number;
+//     name: string;
+// }

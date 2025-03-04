@@ -1,0 +1,131 @@
+class TreeNode {
+    constructor(value) {
+        this.value = value;
+        this.left = null;
+        this.right = null;
+    }
+}
+
+class BinaryTree {
+    constructor() {
+        this.root = null;
+    }
+
+    // Вставка элемента
+    insert(value) {
+        const newNode = new TreeNode(value);
+        if (!this.root) {
+            this.root = newNode;
+            return;
+        }
+
+        this.insertNode(this.root, newNode);
+    }
+
+    insertNode(node, newNode) {
+        if (newNode.value < node.value) {
+            if (!node.left) {
+                node.left = newNode;
+            } else {
+                this.insertNode(node.left, newNode);
+            }
+        } else {
+            if (!node.right) {
+                node.right = newNode;
+            } else {
+                this.insertNode(node.right, newNode);
+            }
+        }
+    }
+
+    // Поиск элемента
+    search(value) {
+        return this.searchNode(this.root, value);
+    }
+
+    searchNode(node, value) {
+        if (!node) {
+            return false;
+        }
+        if (value === node.value) {
+            return true;
+        }
+        return value < node.value ? this.searchNode(node.left, value) : this.searchNode(node.right, value);
+    }
+
+    // Удаление элемента
+    delete(value) {
+        this.root = this.deleteNode(this.root, value);
+    }
+
+    deleteNode(node, value) {
+        if (!node) {
+            return null;
+        }
+        
+        if (value < node.value) {
+            node.left = this.deleteNode(node.left, value);
+        } else if (value > node.value) {
+            node.right = this.deleteNode(node.right, value);
+        } else {
+            // Узел с одним или нулевым потомком
+            if (!node.left) {
+                return node.right;
+            } else if (!node.right) {
+                return node.left;
+            }
+
+            // Узел с двумя потомками
+            const minRightNode = this.findMinNode(node.right);
+            node.value = minRightNode.value;
+            node.right = this.deleteNode(node.right, minRightNode.value);
+        }
+        return node;
+    }
+
+    findMinNode(node) {
+        while (node.left) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    // Изменение элемента
+    update(oldValue, newValue) {
+        this.delete(oldValue);
+        this.insert(newValue);
+    }
+
+    // Определение высоты дерева
+    height() {
+        return this.calculateHeight(this.root);
+    }
+
+    calculateHeight(node) {
+        if (!node) {
+            return -1; // Возвращаем -1 для учета высоты узлов
+        }
+        const leftHeight = this.calculateHeight(node.left);
+        const rightHeight = this.calculateHeight(node.right);
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+}
+
+// Пример использования
+const tree = new BinaryTree();
+tree.insert(10);
+tree.insert(5);
+tree.insert(15);
+tree.insert(3);
+
+console.log(tree.search(5)); // true
+console.log(tree.search(12)); // false
+
+tree.update(5, 6);
+console.log(tree.search(5)); // false
+console.log(tree.search(6)); // true
+
+console.log(tree.height()); // 2
+
+tree.delete(10);
+console.log(tree.search(10)); // false
